@@ -28,6 +28,11 @@ from PyQt4 import QtGui
 import PropertyBag
 from BlissFramework import Qt4_Icons
 
+try:
+    from PyQt4.QtCore import QStringList
+except:
+    QtCore.QStringList = list
+
 
 class Qt4_ConfigurationTable(QtGui.QTableWidget):
     """

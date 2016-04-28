@@ -75,6 +75,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.addProperty('helpIncrease', 'string', '')
         self.addProperty('hideInUser', 'boolean', False)
         self.addProperty('defaultStep', 'string', '')
+        self.addProperty('tabNameToBeMonitoring', 'string', '')
 
         # Signals ------------------------------------------------------------
 
@@ -82,6 +83,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.defineSlot('setEnabled',())
         self.defineSlot('setDisabled',())
         self.defineSlot('toggle_enabled',())
+        self.defineSlot('monitor',())
 
         # Graphic elements-----------------------------------------------------
         self.main_gbox = QtGui.QGroupBox(self)
@@ -181,7 +183,15 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
 
         # Other ---------------------------------------------------------------
         #self.instanceSynchronize("position_spinbox","step_list")
- 
+
+    def monitor(self, tab=None):
+        if ((tab is not None) and (self.motor_hwobj is not None)):
+            try:
+                # The monitor method was created only for some motor classes
+                self.motor_hwobj.monitor(tab == self['tabNameToBeMonitoring'])
+            except:
+                pass
+
     def setExpertMode(self, mode):
         """
         Descript. :

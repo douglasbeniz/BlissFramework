@@ -262,6 +262,7 @@ class ToolboxWindow(QtGui.QWidget):
                     moduleContents = brick_module_file.read()
 
                     checkIfItsBrick = re.compile('^\s*class\s+%s.+?:\s*$' % brickName,re.M)
+
                     if not checkIfItsBrick.search(moduleContents) : continue
 
                     match = findCategoryRE.search(moduleContents)
