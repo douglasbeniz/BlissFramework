@@ -30,6 +30,13 @@ class Qt4_EnergyBrick(BlissWidget):
     """
     Descript. : EnergyBrick displays actual energy and wavelength.
     """
+    STATE_COLORS = (Qt4_widget_colors.LIGHT_RED,     # error
+                    Qt4_widget_colors.DARK_GRAY,     # unknown
+                    Qt4_widget_colors.LIGHT_GREEN,   # ready
+                    Qt4_widget_colors.LIGHT_YELLOW,  
+                    Qt4_widget_colors.LIGHT_YELLOW,
+                    Qt4_widget_colors.LIGHT_YELLOW)
+
     def __init__(self, *args):
         """
         Descript. : Initiates BlissWidget Brick
@@ -124,12 +131,14 @@ class Qt4_EnergyBrick(BlissWidget):
                 self.disconnect(self.energy_hwobj, QtCore.SIGNAL('deviceReady'), self.connected)
                 self.disconnect(self.energy_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
                 self.disconnect(self.energy_hwobj, QtCore.SIGNAL('energyChanged'), self.energy_changed)
+                self.disconnect(self.energy_hwobj, QtCore.SIGNAL('stateChanged'), self.state_changed)
             self.energy_hwobj = self.getHardwareObject(new_value)
             if self.energy_hwobj is not None:
                 self.set_new_value_limits()
                 self.connect(self.energy_hwobj, QtCore.SIGNAL('deviceReady'), self.connected)
                 self.connect(self.energy_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
                 self.connect(self.energy_hwobj, QtCore.SIGNAL('energyChanged'), self.energy_changed)
+                self.connect(self.energy_hwobj, QtCore.SIGNAL('stateChanged'), self.state_changed, instanceFilter=True)
                 self.energy_hwobj.update_values() 
                 if self.energy_hwobj.isReady():
                     self.connected()
@@ -166,10 +175,6 @@ class Qt4_EnergyBrick(BlissWidget):
                 self.new_value_ledit,
                 Qt4_widget_colors.LINE_EDIT_ACTIVE,
                 QtGui.QPalette.Base)
-             #Qt4_widget_colors.set_widget_color(\
-             #   self.units_combobox,
-             #   Qt4_widget_colors.LIGHT_GREEN,
-             #   QtGui.QPalette.Button) 
 
     def disconnected(self):
         """
@@ -196,7 +201,7 @@ class Qt4_EnergyBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        self.energy_hwobj.move_energy(float(self.new_value_ledit.text()))
+        self.energy_hwobj.move_energy(float(self.new_value_ledit.text()), self.units_combobox.currentIndex())
         self.new_value_ledit.setText("")
 
     def input_field_changed(self, input_field_text):
@@ -236,9 +241,9 @@ class Qt4_EnergyBrick(BlissWidget):
             value_limits = self.energy_hwobj.get_wavelength_limits()
             tool_tip = "Wavelength limits"
         if value_limits is not None:
-            self.new_value_validator.setRange(value_limits[0], value_limits[1], 2)    
+            self.new_value_validator.setRange(value_limits[0], value_limits[1], 3)    
             self.new_value_ledit.setValidator(self.new_value_validator)
-            self.new_value_ledit.setToolTip("%s %.2f : %.2f" % \
+            self.new_value_ledit.setToolTip("%s %.3f : %.3f" % \
                  (tool_tip, value_limits[0], value_limits[1]))
    
     def stop_clicked(self):
@@ -247,4 +252,32 @@ class Qt4_EnergyBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        print("stoped clicked")
+        self.energy_hwobj.stop()
+
+    def state_changed(self, state):
+        """
+        Descript. :
+        Args.     :
+        Return.   : 
+        """
+        self.set_energy_ledit_color(state)
+        if state in (self.energy_hwobj.READY, self.energy_hwobj.NOTINITIALIZED, self.energy_hwobj.UNUSABLE, self.energy_hwobj.ONLIMIT):
+            self.stop_button.setEnabled(False)
+        elif state in (self.energy_hwobj.MOVING, self.energy_hwobj.MOVESTARTED):
+            self.stop_button.setEnabled(True)
+
+    def set_energy_ledit_color(self, state):
+        """
+        Descript. :
+        Args.     :
+        Return.   : 
+        """
+        color = Qt4_EnergyBrick.STATE_COLORS[state]
+
+        Qt4_widget_colors.set_widget_color(self.energy_ledit,
+                                           color,
+                                           QtGui.QPalette.Base) 
+
+        Qt4_widget_colors.set_widget_color(self.wavelength_ledit,
+                                           color,
+                                           QtGui.QPalette.Base) 
