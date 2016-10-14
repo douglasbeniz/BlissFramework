@@ -73,6 +73,8 @@ class Qt4_ResolutionBrick(BlissWidget):
         self.group_box = QtGui.QGroupBox("Resolution", self)
         current_label = QtGui.QLabel("Current:", self.group_box)
         current_label.setFixedWidth(75)
+        # LNLS
+        distance_label = QtGui.QLabel("Distance: ", self.group_box)
 
         self.resolution_ledit = QtGui.QLineEdit(self.group_box)
         self.resolution_ledit.setReadOnly(True)
@@ -97,8 +99,10 @@ class Qt4_ResolutionBrick(BlissWidget):
         _new_value_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _group_box_gridlayout = QtGui.QGridLayout(self.group_box)
-        _group_box_gridlayout.addWidget(current_label, 0, 0, 2, 1)
+        _group_box_gridlayout.addWidget(current_label, 0, 0)
         _group_box_gridlayout.addWidget(self.resolution_ledit, 0, 1)
+        # LNLS
+        _group_box_gridlayout.addWidget(distance_label, 1, 0)
         _group_box_gridlayout.addWidget(self.detector_distance_ledit, 1, 1)
         _group_box_gridlayout.addWidget(set_to_label, 2, 0)
         _group_box_gridlayout.addWidget(_new_value_widget, 2, 1)
@@ -267,6 +271,7 @@ class Qt4_ResolutionBrick(BlissWidget):
             self.new_value_ledit.setText("")
         except (ValueError,TypeError):
             return
+
         if unit == chr(197):
             self.set_resolution(value)
         elif unit=="mm":
@@ -463,47 +468,8 @@ class Qt4_ResolutionBrick(BlissWidget):
                 color = Qt4_widget_colors.LIGHT_RED
 
             unit = self.units_combobox.currentText()
-            if unit == chr(197):
-                if state == self.detector_distance_hwobj.READY:
-                    self.new_value_ledit.blockSignals(True)
-                    self.new_value_ledit.setText("")
-                    self.new_value_ledit.blockSignals(False)
-                    self.new_value_ledit.setEnabled(True)
-                else:
-                    self.new_value_ledit.setEnabled(False)
-                if state == self.detector_distance_hwobj.MOVING or \
-                   state == self.detector_distance_hwobj.MOVESTARTED:
-                    self.stop_button.setEnabled(True)
-                else:
-                    self.stop_button.setEnabled(False)
-
-                Qt4_widget_colors.set_widget_color(self.new_value_ledit, color)
-
-                #replace with isReady
-                if state == self.detector_distance_hwobj.READY:
-                    if self.original_background_color is None:
-                        #self.original_background_color = self.paletteBackgroundColor()
-                        self.original_background_color = Qt4_widget_colors.LINE_EDIT_ORIGINAL
-                    color = self.original_background_color
-
-                """
-                w_palette=self.newValue.palette()
-                try:
-                    cg=self.colorGroupDict[state]
-                except KeyError:
-                    cg=QColorGroup(w_palette.disabled())
-                    cg.setColor(cg.Background,color)
-                    self.colorGroupDict[state]=cg
-                w_palette.setDisabled(cg)
-                """
-    def detector_distance_state_changed(self, state):
-        if state is None:
-            #Fix this TODO
-            return
-
-        color = Qt4_ResolutionBrick.STATE_COLORS[state]
-        unit = self.units_combobox.currentText()
-        if unit == "mm":
+            # LNLS
+            #if unit == chr(197):
             if state == self.detector_distance_hwobj.READY:
                 self.new_value_ledit.blockSignals(True)
                 self.new_value_ledit.setText("")
@@ -517,12 +483,57 @@ class Qt4_ResolutionBrick(BlissWidget):
             else:
                 self.stop_button.setEnabled(False)
 
-            Qt4_widget_colors.set_widget_color(self.new_value_ledit, color)
+            # LNLS
+            #Qt4_widget_colors.set_widget_color(self.new_value_ledit, color)
+            Qt4_widget_colors.set_widget_color(self.resolution_ledit, color, QtGui.QPalette.Base)
 
+            #replace with isReady
             if state == self.detector_distance_hwobj.READY:
                 if self.original_background_color is None:
+                    #self.original_background_color = self.paletteBackgroundColor()
                     self.original_background_color = Qt4_widget_colors.LINE_EDIT_ORIGINAL
                 color = self.original_background_color
+
+            """
+            w_palette=self.newValue.palette()
+            try:
+                cg=self.colorGroupDict[state]
+            except KeyError:
+                cg=QColorGroup(w_palette.disabled())
+                cg.setColor(cg.Background,color)
+                self.colorGroupDict[state]=cg
+            w_palette.setDisabled(cg)
+            """
+    def detector_distance_state_changed(self, state):
+        if state is None:
+            #Fix this TODO
+            return
+
+        color = Qt4_ResolutionBrick.STATE_COLORS[state]
+        unit = self.units_combobox.currentText()
+        # LNLS
+        #if unit == "mm":
+        if state == self.detector_distance_hwobj.READY:
+            self.new_value_ledit.blockSignals(True)
+            self.new_value_ledit.setText("")
+            self.new_value_ledit.blockSignals(False)
+            self.new_value_ledit.setEnabled(True)
+        else:
+            self.new_value_ledit.setEnabled(False)
+        if state == self.detector_distance_hwobj.MOVING or \
+           state == self.detector_distance_hwobj.MOVESTARTED:
+            self.stop_button.setEnabled(True)
+        else:
+            self.stop_button.setEnabled(False)
+
+        # LNLS
+        #Qt4_widget_colors.set_widget_color(self.new_value_ledit, color)
+        Qt4_widget_colors.set_widget_color(self.detector_distance_ledit, color, QtGui.QPalette.Base)
+
+        if state == self.detector_distance_hwobj.READY:
+            if self.original_background_color is None:
+                self.original_background_color = Qt4_widget_colors.LINE_EDIT_ORIGINAL
+            color = self.original_background_color
 
     def stop_clicked(self):
         unit = self.units_combobox.currentText()

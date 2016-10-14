@@ -139,8 +139,10 @@ class Qt4_EnergyBrick(BlissWidget):
                 self.connect(self.energy_hwobj, QtCore.SIGNAL('deviceNotReady'), self.disconnected)
                 self.connect(self.energy_hwobj, QtCore.SIGNAL('energyChanged'), self.energy_changed)
                 self.connect(self.energy_hwobj, QtCore.SIGNAL('stateChanged'), self.state_changed, instanceFilter=True)
-                self.energy_hwobj.update_values() 
+
                 if self.energy_hwobj.isReady():
+                    # LNLS
+                    self.energy_hwobj.update_values()
                     self.connected()
                 else:
                     self.disconnected()
