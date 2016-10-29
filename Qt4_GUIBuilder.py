@@ -752,8 +752,6 @@ class GUIEditorWindow(QtGui.QWidget):
         parent = self.configuration.findContainer(parent_name)
         new_item = None
         new_list_item = None
-       
-
      
         try:
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
@@ -766,7 +764,6 @@ class GUIEditorWindow(QtGui.QWidget):
                 else:
                     new_item["properties"].getProperty("w").setValue(QtGui.QApplication.desktop().width())
                     new_item["properties"].getProperty("h").setValue(QtGui.QApplication.desktop().height())
-                    
                     new_list_item = self.appendItem(parentListItem, new_item["name"], "window", icon="window_small")
             elif item_type == "brick":
                 brick_type = args[0]

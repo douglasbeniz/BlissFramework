@@ -38,7 +38,9 @@ class Qt4_DuoStateBrick(BlissWidget):
         'unknown': (Qt4_widget_colors.LIGHT_GRAY, True, True, False, False),
         'disabled': (Qt4_widget_colors.LIGHT_GRAY, False, False, False, False),
         'error': (Qt4_widget_colors.LIGHT_RED, True, True, False, False),
-        'out': (Qt4_widget_colors.LIGHT_GREEN, True, True, False, True),
+        # LNLS
+        # 'out': (Qt4_widget_colors.LIGHT_GREEN, True, True, False, True),
+        'out': (Qt4_widget_colors.LIGHT_RED, True, True, False, True),
         'moving': (Qt4_widget_colors.LIGHT_YELLOW, False, False, None, None),
         'in': (Qt4_widget_colors.LIGHT_GREEN, True, True, True, False),
         'automatic': (Qt4_widget_colors.WHITE, True, True, False, False)
@@ -121,7 +123,11 @@ class Qt4_DuoStateBrick(BlissWidget):
         if not expert and self["expertModeControlOnly"]:
             self.buttons_widget.hide()
 
-        
+
+    # LNLS
+    def setEnableControls(self, enable=True):
+        self.buttons_widget.setEnabled(enable)
+
     def set_in(self, state):
         if state:
             self.wrapper_hwobj.setIn()
@@ -207,6 +213,7 @@ class Qt4_DuoStateBrick(BlissWidget):
         if propertyName=='mnemonic':
             if self.wrapper_hwobj is not None:
                 self.wrapper_hwobj.duoStateChangedSignal.disconnect(self.stateChanged)
+                self.wrapper_hwobj.duoEnableControlsSignal.disconnect(self.setEnableControls)
 
             h_obj=self.getHardwareObject(newValue)
             if h_obj is not None:
@@ -222,6 +229,7 @@ class Qt4_DuoStateBrick(BlissWidget):
                 self.set_out_button.setToolTip(help_text)
                 self.main_gbox.setTitle(self['username'])
                 self.wrapper_hwobj.duoStateChangedSignal.connect(self.stateChanged)
+                self.wrapper_hwobj.duoEnableControlsSignal.connect(self.setEnableControls)
                 self.stateChanged(self.wrapper_hwobj.getState())
             else:
                 self.wrapper_hwobj=None
@@ -314,6 +322,7 @@ class WrapperHO(QtCore.QObject):
                  "MD2v4_FastShutter": "Shutter",
                  "TempShutter": "Shutter",
                  "EMBLSafetyShutter": "Shutter",
+                 "LNLSShutter": "Shutter",
                  "MDFastShutter" : "Shutter", 
                  "WagoPneu" : "WagoPneu",
                  "Shutter" : "WagoPneu",
@@ -338,6 +347,7 @@ class WrapperHO(QtCore.QObject):
     STATES = ('unknown','disabled','error','out','moving','in','automatic')
 
     duoStateChangedSignal = QtCore.pyqtSignal(str, str)
+    duoEnableControlsSignal = QtCore.pyqtSignal(bool)
 
     def __init__(self, hardware_obj):
         QtCore.QObject.__init__(self)
@@ -384,20 +394,22 @@ class WrapperHO(QtCore.QObject):
     # WagoPneu HO methods
     def initWagoPneu(self):
         self.dev.connect(self.dev,'wagoStateChanged', self.stateChangedWagoPneu)
+
     def setInWagoPneu(self):
         self.duoStateChangedSignal.emit('moving')
         self.dev.wagoIn()
+
     def setOutWagoPneu(self):
         self.duoStateChangedSignal.emit('moving') 
         self.dev.wagoOut()
-    def stateChangedWagoPneu(self,state):
-       
 
+    def stateChangedWagoPneu(self,state):
         try:
             state=WrapperHO.wagoStateDict[state]
         except KeyError:
             state='error'
         self.duoStateChangedSignal.emit(state)
+
     def getStateWagoPneu(self):
         state=self.dev.getWagoState()
         try:
@@ -409,10 +421,17 @@ class WrapperHO(QtCore.QObject):
     # Shutter HO methods
     def initShutter(self):
         self.dev.connect(self.dev, 'shutterStateChanged', self.stateChangedShutter)
+        self.dev.connect(self.dev, 'enableControls', self.enableControls)
+
     def setInShutter(self):
         self.dev.openShutter()
+
     def setOutShutter(self):
         self.dev.closeShutter()
+
+    def enableControls(self, enable=True):
+        self.duoEnableControlsSignal.emit(enable)
+
     def stateChangedShutter(self, state, state_label=None):
         try:
             state=WrapperHO.shutterStateDict[state]
@@ -421,6 +440,7 @@ class WrapperHO(QtCore.QObject):
         if not state_label:
             state_label=""
         self.duoStateChangedSignal.emit(state, state_label)
+
     def getStateShutter(self):
         state=self.dev.getShutterState()
         try:
@@ -435,12 +455,15 @@ class WrapperHO(QtCore.QObject):
         self.dev.connect(self.dev, 'predefinedPositionChanged', self.positionChangedSpecMotorWSpecPositions)
         self.dev.connect(self.dev, 'stateChanged', self.stateChangedSpecMotorWSpecPositions)
         self.dev.connect(self.dev, 'newPredefinedPositions', self.newPredefinedSpecMotorWSpecPositions)
+
     def setInSpecMotorWSpecPositions(self):
         if self.positions is not None:
             self.dev.moveToPosition(self.positions[1])
+
     def setOutSpecMotorWSpecPositions(self):
         if self.positions is not None:
             self.dev.moveToPosition(self.positions[0])
+
     def stateChangedSpecMotorWSpecPositions(self,state):
         #logging.info("stateChangedSpecMotorWSpecPositions %s" % state)
         try:
@@ -449,6 +472,7 @@ class WrapperHO(QtCore.QObject):
             state = 'error'
         if state is not None:
             self.duoStateChangedSignal.emit(state) 
+
     def positionChangedSpecMotorWSpecPositions(self,pos_name,pos):
         if self.dev.getState()!=self.dev.READY:
             return
@@ -458,6 +482,7 @@ class WrapperHO(QtCore.QObject):
                 if pos_name==self.positions[i]:
                     state=WrapperHO.motorWPosDict[i]
         self.duoStateChangedSignal.emit(state)
+
     def getStateSpecMotorWSpecPositions(self):
         if self.positions is None:
             return "error"
@@ -474,6 +499,7 @@ class WrapperHO(QtCore.QObject):
                 if curr_pos==self.positions[i]:
                     return WrapperHO.motorWPosDict[i]                    
         return 'error'
+
     def newPredefinedSpecMotorWSpecPositions(self): 
         self.positions=self.dev.getPredefinedPositionsList()
         self.positionChangedSpecMotorWSpecPositions(self.dev.getCurrentPositionName(),self.dev.getPosition())
@@ -527,12 +553,15 @@ class WrapperHO(QtCore.QObject):
         except KeyError:
             pass
         self.duoStateChangedSignal.emit(state)
+
     def setInProcedure(self):
         if self.setInCmd is not None:
             self.setInCmd()
+
     def setOutProcedure(self):
         if self.setOutCmd is not None:
             self.setOutCmd()
+
     """
     def stateChangedProcedure(self,state):
         pass
@@ -559,6 +588,7 @@ class WrapperHO(QtCore.QObject):
                 pass
             return state
         return "unknown"
+
     def procedureSetInEnded(self, *args):
         self.duoStateChangedSignal.emit('in')
         

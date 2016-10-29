@@ -451,14 +451,16 @@ class Qt4_ResolutionBrick(BlissWidget):
             self.detector_distance_limits = None
 
     def resolution_value_changed(self, resolution):
-        resolution_str = self['angFormatString'] % float(resolution)
-        self.resolution_value = self['angFormatString'] % resolution
-        self.resolution_ledit.setText("%s %s" % (resolution_str, chr(197)))
+        if (resolution is not None):
+            resolution_str = self['angFormatString'] % float(resolution)
+            self.resolution_value = self['angFormatString'] % resolution
+            self.resolution_ledit.setText("%s %s" % (resolution_str, chr(197)))
 
     def detector_distance_changed(self, detector):
-        detector_str=self['mmFormatString'] % detector
-        self.detector_distance_value = self['mmFormatString'] % detector
-        self.detector_distance_ledit.setText("%s mm" % detector_str)
+        if (detector is not None):
+            detector_str=self['mmFormatString'] % detector
+            self.detector_distance_value = self['mmFormatString'] % detector
+            self.detector_distance_ledit.setText("%s mm" % detector_str)
 
     def resolution_state_changed(self, state):
         if self.detector_distance_hwobj is not None:

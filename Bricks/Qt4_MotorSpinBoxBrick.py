@@ -480,7 +480,7 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         try:
            self.position_spinbox.setValue(float(new_position))
         except:
-           print(('ERROR!!! Setting position...' + str(new_position)))
+           print(('Error!!! Setting position...' + str(new_position)))
            pass
 
     def set_position_spinbox_color(self, state):
