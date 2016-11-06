@@ -192,10 +192,13 @@ class Qt4_EnergyBrick(BlissWidget):
         Args.     :
         Return.   : 
         """
-        energy_value_str = self['kevFormatString'] % energy_value
-        wavelength_value_str = self['angFormatString'] % wavelength_value
-        self.energy_ledit.setText("%s keV" % energy_value_str)
-        self.wavelength_ledit.setText("%s %s" %(wavelength_value_str, chr(197)))
+        if (energy_value is not None):
+            energy_value_str = self['kevFormatString'] % energy_value
+            self.energy_ledit.setText("%s keV" % energy_value_str)
+
+        if (wavelength_value is not None):
+            wavelength_value_str = self['angFormatString'] % wavelength_value
+            self.wavelength_ledit.setText("%s %s" %(wavelength_value_str, chr(197)))
 
     def current_value_changed(self):
         """

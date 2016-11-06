@@ -71,10 +71,10 @@ class Qt4_ResolutionBrick(BlissWidget):
         self.addProperty('angFormatString','formatString','##.###')        
 
         self.group_box = QtGui.QGroupBox("Resolution", self)
-        current_label = QtGui.QLabel("Current:", self.group_box)
-        current_label.setFixedWidth(75)
+        self.current_label = QtGui.QLabel("Current:", self.group_box)
+        self.current_label.setFixedWidth(75)
         # LNLS
-        distance_label = QtGui.QLabel("Distance: ", self.group_box)
+        self.distance_label = QtGui.QLabel("Distance: ", self.group_box)
 
         self.resolution_ledit = QtGui.QLineEdit(self.group_box)
         self.resolution_ledit.setReadOnly(True)
@@ -99,10 +99,10 @@ class Qt4_ResolutionBrick(BlissWidget):
         _new_value_widget_hlayout.setContentsMargins(0, 0, 0, 0)
 
         _group_box_gridlayout = QtGui.QGridLayout(self.group_box)
-        _group_box_gridlayout.addWidget(current_label, 0, 0)
+        _group_box_gridlayout.addWidget(self.current_label, 0, 0)
         _group_box_gridlayout.addWidget(self.resolution_ledit, 0, 1)
         # LNLS
-        _group_box_gridlayout.addWidget(distance_label, 1, 0)
+        _group_box_gridlayout.addWidget(self.distance_label, 1, 0)
         _group_box_gridlayout.addWidget(self.detector_distance_ledit, 1, 1)
         _group_box_gridlayout.addWidget(set_to_label, 2, 0)
         _group_box_gridlayout.addWidget(_new_value_widget, 2, 1)
@@ -325,6 +325,7 @@ class Qt4_ResolutionBrick(BlissWidget):
             #f_mm.setBold(False)
             #f_ang.setBold(True)
             self.group_box.setTitle('Resolution')
+            self.current_label.setText('Current')
             self.resolution_state_changed(self.resolution_hwobj.getState())
             #self.new_value_validator.setRange(self.resolution_limits[0],
             #                                  self.resolution_limits[1])  
@@ -332,6 +333,7 @@ class Qt4_ResolutionBrick(BlissWidget):
             #f_mm.setBold(True)
             #f_ang.setBold(False)
             self.group_box.setTitle('Detector distance')
+            self.current_label.setText('Resolution')
             self.detector_distance_state_changed(self.detector_distance_hwobj.getState())
             #self.new_value_validator.setRange(self.detector_distance_limits[0],
             #                                  self.detector_distance_limits[1])
