@@ -215,6 +215,15 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
                                            Qt4_widget_colors.LINE_EDIT_CHANGED, 
                                            QtGui.QPalette.Button)
 
+    # LNLS
+    def set_precision(self):
+        if ((self['formatString'].find('.') > -1) and (self['formatString'].find('f') > -1)):
+            try:
+                decimalDigits = int(self['formatString'].split('.')[1].split('f')[0])
+                self.position_spinbox.setDecimals(decimalDigits)
+            except:
+                pass
+
     def step_changed(self, step):
         """
         Descript. :
@@ -689,6 +698,9 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         elif property_name == 'formatString':
             if self.motor_hwobj is not None:
                 self.update_GUI()
+            # LNLS
+            self.set_precision()
+            # ---
         elif property_name == 'label':
             self.setLabel(new_value)
         elif property_name == 'showLabel':
