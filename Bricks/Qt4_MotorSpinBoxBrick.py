@@ -119,6 +119,10 @@ class Qt4_MotorSpinBoxBrick(BlissWidget):
         self.step_button.setIcon(self.step_button_icon)
         self.step_button.setToolTip("Changes the motor step")
         self.step_cbox = QtGui.QComboBox(self.extra_button_box)
+        # LNLS
+        self.step_cbox.setMinimumWidth(75)
+        self.step_cbox.setMaximumWidth(85)
+        # -----
         self.step_cbox.setEditable(True)
         self.step_cbox.setValidator(QtGui.QDoubleValidator(0, 360, 5, self.step_cbox))
         self.step_cbox.setDuplicatesEnabled(False)
