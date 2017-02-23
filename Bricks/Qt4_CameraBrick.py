@@ -245,12 +245,15 @@ class Qt4_CameraBrick(BlissWidget):
             self.graphics_view.setFixedSize(self.fixed_size[0], self.fixed_size[1]) 
             #self.info_widget.setFixedWidth(self.fixed_size[0])
 
+
     def image_scaled(self, scale_value):
         for index, action in enumerate(self.image_scale_menu.actions()):
             action.setChecked(scale_value == self.image_scale_list[index])
 
+
     def init_image_zoom_list(self):
         self.image_scale_list = self.graphics_manager_hwobj.get_image_scale_list()
+
         if len(self.image_scale_list) > 0:
             self.image_scale_menu.setEnabled(True)
             self.image_scale_menu.triggered.connect(self.image_scale_triggered)
