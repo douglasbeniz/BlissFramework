@@ -358,6 +358,7 @@ class WrapperHO(QtCore.QObject):
         #self.getState = new.instancemethod(lambda self: "unknown", self)
         self.getState = lambda self: "unknown"
         self.dev=hardware_obj
+
         try:
             sClass = str(self.dev.__class__)
             i, j = re.search("'.*'", sClass).span()
