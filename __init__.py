@@ -102,16 +102,23 @@ def setLogFile(filename):
     # log to rotating files
     #
     global _hdlr
-    #from logging.handlers import RotatingFileHandler
-    from logging.handlers import TimedRotatingFileHandler
+    from logging.handlers import RotatingFileHandler
+    #from logging.handlers import TimedRotatingFileHandler
 
     logging.getLogger().info("Logging to file %s" % filename)
 
     _logger.removeHandler(_hdlr)
         
-    #_hdlr = RotatingFileHandler(filename, 'a', 1048576, 10) #1 MB by file, 10 files max.
-    _hdlr = TimedRotatingFileHandler(filename, when='midnight', backupCount=1)
-    os.chmod(filename, 0o666)
+    #_hdlr = RotatingFileHandler(filename=filename, mode='a', maxBytes=1048576, backupCount=10) #1 MB by file, 10 files max.
+    _hdlr = RotatingFileHandler(filename=filename, mode='a', maxBytes=52428800, backupCount=10) # 50 MB by file, 10 files max.
+    #_hdlr = TimedRotatingFileHandler(filename, when='midnight', backupCount=1)
+
+    try:
+        os.chmod(filename, 0o666)
+    except PermissionError:
+        logging.getLogger().error("Error to change log file permission! Already exists?")
+        pass
+
     _hdlr.setFormatter(_formatter)
     _logger.addHandler(_hdlr)
 
