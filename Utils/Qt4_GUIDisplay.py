@@ -522,6 +522,7 @@ class WindowDisplayWidget(QtGui.QScrollArea):
                 self.__dict__[slotName.replace(" ", "_")] = types.MethodType(tab_slot, self)
             except:
                 logging.getLogger().exception("Could not add slot %s in %s", slotName, str(self.objectName()))
+
             slotName = "hidePage_%s" % label
             def tab_slot(self, hide=True, page = {"widget" : scroll_area, \
                          "label": self.tabText(self.indexOf(scroll_area)), 

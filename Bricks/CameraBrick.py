@@ -169,8 +169,8 @@ class CameraBrick(BlissWidget):
         self.__wholeActions.append(self.__gridToolAction)
 
         self.__previous_pos_dict = {}
-        self.__beamWidth = 0
-        self.__beamHeight = 0
+        self.__beamWidth = 10
+        self.__beamHeight = 10
 
         ####### BEAM ACTION #######
         self.__beamAction = QubBeamAction(name="beam", group="Tools")

@@ -46,6 +46,8 @@ class Qt4_LightIntensityBrick(BlissWidget):
         # Properties ----------------------------------------------------------       
         self.addProperty('mnemonic', 'string', '')
         self.addProperty('label', 'string', '')
+        self.addProperty('minimum', 'integer', '0')
+        self.addProperty('maximum', 'integer', '100')
 
         # Signals ------------------------------------------------------------
 
@@ -62,7 +64,7 @@ class Qt4_LightIntensityBrick(BlissWidget):
         self.intensity_spinbox.setMinimum(0)
         self.intensity_spinbox.setMaximum(100)
         self.intensity_spinbox.setDecimals(0)
-        self.intensity_spinbox.setMinimumSize(QtCore.QSize(45, 25))
+        self.intensity_spinbox.setMinimumSize(QtCore.QSize(35, 25))
         self.intensity_spinbox.setMaximumSize(QtCore.QSize(55, 25))
         self.intensity_spinbox.setToolTip("Set the light intensity from 0% until 100%")
  
@@ -113,6 +115,10 @@ class Qt4_LightIntensityBrick(BlissWidget):
                 self.disconnected()
         elif property_name == 'label':
             self.group_box.setTitle(new_value)
+        elif property_name == 'minimum':
+            self.intensity_spinbox.setMinimum(new_value)
+        elif property_name == 'maximum':
+            self.intensity_spinbox.setMaximum(new_value)
         else:
             BlissWidget.propertyChanged(self, property_name, old_value, new_value)
 
